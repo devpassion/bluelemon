@@ -26,6 +26,12 @@
 #include <iostream>
 
 #include "gpioio.h"
+#include "io_exception.h"
+
+
+
+#include <chrono>
+#include <thread>
 
 namespace io
 {
@@ -71,9 +77,16 @@ namespace io
         ss << static_cast<short>(pin);
         strPin_ = ss.str();
         
-        std::cout << "Create pin " << strPin_ << std::endl;
-        
         std::ofstream fos( exportFile );
+        auto start = std::chrono::steady_clock::now();  
+        while( !fos )
+        {
+            auto elapsed = std::chrono::steady_clock::now() - start;
+            if( elapsed.count() >  fileTimeout)
+            {
+                throw io_exception( "Pin " + strPin_ + " (at export)" );
+            }
+        }
         fos << strPin_;
         fos.close();
     }
@@ -82,7 +95,13 @@ namespace io
     template<template<class> class Direction>
     void SystemInterface::init (  ) const
     {
-        std::ofstream fos( baseGPIOFile + strPin_ + "/direction" );
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::string file(baseGPIOFile + std::string("/gpio") + strPin_ + "/direction");
+        std::ofstream fos( file );
+        if( !fos )
+        {
+            throw io_exception( "Pin " + strPin_ + "(at direction set), file :" + file );
+        }
         fos << StrDirectionTrait<Direction>::value;
         fos.close();
         
@@ -91,6 +110,10 @@ namespace io
     PinState SystemInterface::read (  ) const
     {
         std::ifstream fis( "/sys/class/gpio/gpio" + strPin_ + "/value" );
+        if( !fis )
+        {
+            throw io_exception( "Pin " + strPin_ + "(at read input value)" );
+        }
         char val;
         fis >> val;
         fis.close();
@@ -101,6 +124,10 @@ namespace io
     void SystemInterface::set ( PinState value ) const
     {
         std::ofstream fos( "/sys/class/gpio/gpio" + strPin_ + "/value" );
+        if( !fos )
+        {
+            throw io_exception( "Pin " + strPin_ + "(at write output value)" );
+        }
         fos << static_cast<char>( value );
         fos.close();
     }
@@ -108,6 +135,10 @@ namespace io
     SystemInterface::~SystemInterface()
     {
         std::ofstream fos( unexportFile );
+        if( !fos )
+        {
+            throw io_exception( "Pin " + strPin_ + "(at unexport)" );
+        }
         fos << strPin_;
         fos.close();
     }

@@ -6,7 +6,7 @@ include_directories( includes )
 
 add_definitions( "-std=c++11" )
 
-add_executable(bluelemon main.cpp)
+add_executable(bluelemon main.cpp src/io_exception.cpp)
 
 install(TARGETS bluelemon RUNTIME DESTINATION bin)
 
