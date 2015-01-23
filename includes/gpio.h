@@ -20,54 +20,10 @@
 #ifndef IO_GPIO_H
 #define IO_GPIO_H
 
+#include "pin.h"
+
 namespace io 
 {
-    
-    enum PinState : char
-    {
-        LOW = '0',
-        HIGH = '1'
-    };
-    
-    
-    template<typename InterfacePolicy>
-    class Input
-    {
-        
-        const unsigned char pin_;
-        const InterfacePolicy interface;
-        
-    protected:
-        
-        Input(unsigned char pin);
-    public:
-        PinState read();
-    };
-    
-    template<typename InterfacePolicy>
-    class Output
-    {
-        const unsigned char pin_;
-        const InterfacePolicy interface;
-    protected:
-        
-        Output(unsigned char pin);
-    public:
-        void set( PinState value);
-    };
-    
-    
-    template<template<class> class DirectionPolicy>
-    struct StrDirectionTrait
-    {
-        static constexpr const char* value = "in";
-    };
-    
-    template<>
-    struct StrDirectionTrait<Output>
-    {
-        static constexpr const char* value = "out";
-    };
     
     class SystemInterface
     {
@@ -114,7 +70,8 @@ namespace io
     };
 }
 
+#include "../tpl/gpio.cpp"
+
 #endif // IO_GPIO_H
 
 
-#include "../tpl/gpio.cpp"

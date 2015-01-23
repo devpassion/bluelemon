@@ -25,35 +25,10 @@
 
 #include <iostream>
 
+#include "gpioio.h"
+
 namespace io
 {
-
-    template<typename InterfacePolicy>
-    Input<InterfacePolicy>::Input ( unsigned char pin ) : pin_(pin), interface(pin)
-    {
-        interface.template init<Input>();
-    }
-
-    template<typename InterfacePolicy>
-    Output<InterfacePolicy>::Output ( unsigned char pin ) : pin_(pin), interface(pin)
-    {
-        interface.template init<Output>();
-    }
-
-
-    template<typename InterfacePolicy>
-    PinState Input<InterfacePolicy>::read()
-    {
-        return interface.read();
-    }
-
-    template<typename InterfacePolicy>
-    void Output<InterfacePolicy>::set ( PinState value )
-    {
-        interface.set( value);
-    }
-
-
 
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     GPIO<DirectionPolicy, InterfacePolicy>::GPIO(unsigned short pin) : DirectionPolicy<InterfacePolicy>(pin)
@@ -84,7 +59,7 @@ namespace io
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     bool GPIO<DirectionPolicy, InterfacePolicy>::operator== ( const GPIO& other ) const
     {
-        
+        return DirectionPolicy<InterfacePolicy>::pin_ == other.pin_;
     }
 
 
