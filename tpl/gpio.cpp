@@ -62,11 +62,11 @@ namespace io
     }
 
 
-    template<template<class> class DirectionPolicy, typename InterfacePolicy>
-    GPIO<DirectionPolicy, InterfacePolicy>::GPIO ( const GPIO& other ) 
-    {
-        
-    }
+//     template<template<class> class DirectionPolicy, typename InterfacePolicy>
+//     GPIO<DirectionPolicy, InterfacePolicy>::GPIO ( const GPIO& other ) 
+//     {
+//         
+//     }
 
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     GPIO<DirectionPolicy, InterfacePolicy>::~GPIO()

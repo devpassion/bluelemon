@@ -104,8 +104,10 @@ namespace io
     public:
         GPIO(unsigned short pin);
         
-        GPIO(const GPIO& other);
+        GPIO(const GPIO& other) = delete;
 
+        GPIO& operator=(const GPIO& other) = delete;
+        
         ~GPIO();
         
         bool operator==(const GPIO& other) const;
