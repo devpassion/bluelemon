@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 SET(CMAKE_TOOLCHAIN_FILE "cmake/pi.cmake" )
 project(bluelemon)
 
-include_directories( includes )
+include_directories( includes /usr/local/include )
 
 add_definitions( "-std=c++11" )
 
@@ -16,7 +16,7 @@ add_subdirectory(tpl)
 
 
 set( RASP_USER pi )
-set( RASP_HOST 192.168.0.102)
+set( RASP_HOST bluelemon)
 
 add_upload()
 add_run()

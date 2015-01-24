@@ -21,9 +21,20 @@
 #define IO_GPIO_H
 
 #include "pin.h"
+#include <mutex>
+#include <array>
+#include <arccos/mpltools/interval.h>
 
 namespace io 
 {
+    
+    template<int Val>
+    struct NullFunctor
+    {
+        static constexpr unsigned short value = 0;
+    };
+    
+    
     
     class SystemInterface
     {
@@ -35,6 +46,10 @@ namespace io
         
         static constexpr int fileTimeout = 500;
         
+        static std::array<unsigned short, 18> UserCounts;
+        static std::array<std::mutex, 18> mutexes_;
+        
+        unsigned char pin_;
         std::string strPin_;
         
     public:
@@ -55,9 +70,14 @@ namespace io
     
     
     template<template<class> class DirectionPolicy, typename InterfacePolicy = SystemInterface>
-    class GPIO : public DirectionPolicy<InterfacePolicy>
+    class GPIO final : public DirectionPolicy<InterfacePolicy>
     {
         using SelfType = GPIO<DirectionPolicy, InterfacePolicy>;
+        
+       
+        
+        
+        
         
     public:
         GPIO(unsigned short pin);

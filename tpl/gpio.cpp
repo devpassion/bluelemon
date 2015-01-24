@@ -23,8 +23,6 @@
 #include <sstream>
 #include <fstream>
 
-#include <iostream>
-
 #include "gpioio.h"
 #include "io_exception.h"
 
@@ -36,6 +34,12 @@
 namespace io
 {
 
+    
+    std::array<unsigned short, 18> SystemInterface::UserCounts = 
+            arccos::mptools::make_interval< 0, 17 >::type::ToStaticArray<unsigned short,NullFunctor>::ARR;
+    
+    std::array<std::mutex, 18> SystemInterface::mutexes_;
+            
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     GPIO<DirectionPolicy, InterfacePolicy>::GPIO(unsigned short pin) : DirectionPolicy<InterfacePolicy>(pin)
     {
@@ -52,7 +56,7 @@ namespace io
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     GPIO<DirectionPolicy, InterfacePolicy>::~GPIO()
     {
-
+        std::cout << "delete..." << std::endl;
     }
 
     // template<template<class> class DirectionPolicy, typename InterfacePolicy>
@@ -71,24 +75,33 @@ namespace io
 
 
 
-    SystemInterface::SystemInterface ( unsigned char pin )
+    SystemInterface::SystemInterface ( unsigned char pin ) : pin_(pin)
     {
+        
         std::stringstream ss;
         ss << static_cast<short>(pin);
         strPin_ = ss.str();
         
-        std::ofstream fos( exportFile );
-        auto start = std::chrono::steady_clock::now();  
-        while( !fos )
+        mutexes_[pin].lock();
+        
+        if( UserCounts[pin] == 0 )
         {
-            auto elapsed = std::chrono::steady_clock::now() - start;
-            if( elapsed.count() >  fileTimeout)
+            std::ofstream fos( exportFile );
+            auto start = std::chrono::steady_clock::now();  
+            while( !fos )
             {
-                throw io_exception( "Pin " + strPin_ + " (at export)" );
+                auto elapsed = std::chrono::steady_clock::now() - start;
+                if( elapsed.count() >  fileTimeout)
+                {
+                    throw io_exception( "Pin " + strPin_ + " (at export)" );
+                }
             }
+            fos << strPin_;
+            fos.close();
         }
-        fos << strPin_;
-        fos.close();
+        
+        UserCounts[pin]++;
+        mutexes_[pin].unlock();
     }
 
 
@@ -134,13 +147,19 @@ namespace io
 
     SystemInterface::~SystemInterface()
     {
-        std::ofstream fos( unexportFile );
-        if( !fos )
+        mutexes_[pin_].lock();
+        UserCounts[pin_]--;
+        if( UserCounts[pin_] == 0 )
         {
-            throw io_exception( "Pin " + strPin_ + "(at unexport)" );
+            std::ofstream fos( unexportFile );
+            if( !fos )
+            {
+                throw io_exception( "Pin " + strPin_ + "(at unexport)" );
+            }
+            fos << strPin_;
+            fos.close();
         }
-        fos << strPin_;
-        fos.close();
+        mutexes_[pin_].unlock();
     }
 
 }
