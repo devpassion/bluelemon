@@ -5,6 +5,10 @@ project(bluelemon)
 include_directories( includes /usr/local/include )
 
 add_definitions( "-std=c++11" )
+add_definitions( "-Os -s" )
+
+# add_definitions( "-findirect-inlining -finline-functions -finline-functions-called-once -finline-small-functions" )
+
 
 add_executable(bluelemon main.cpp src/io_exception.cpp)
 

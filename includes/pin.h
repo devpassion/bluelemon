@@ -20,6 +20,9 @@
 #ifndef IO_PIN_H
 #define IO_PIN_H
 
+#include <type_traits>
+
+
 namespace io
 {
      enum PinState : char

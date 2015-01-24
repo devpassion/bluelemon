@@ -20,10 +20,13 @@
 #ifndef IO_GPIO_H
 #define IO_GPIO_H
 
-#include "pin.h"
+
 #include <mutex>
 #include <array>
 #include <arccos/mpltools/interval.h>
+
+#include "pin.h"
+#include "io_exception.h"
 
 namespace io 
 {
@@ -54,14 +57,14 @@ namespace io
         
     public:
         
-        SystemInterface(unsigned char pin);
+        SystemInterface(unsigned char pin) throw(io_exception);
         
         template<template<class> class Direction>
-        void init() const;
+        void init() const throw(io_exception);
         
-        void set(PinState value) const;
+        void set(PinState value) const throw(io_exception);
         
-        PinState read() const;
+        PinState read() const throw(io_exception); 
         
         ~SystemInterface();
       

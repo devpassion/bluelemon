@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 #include "gpioio.h"
 #include "io_exception.h"
@@ -56,7 +57,7 @@ namespace io
     template<template<class> class DirectionPolicy, typename InterfacePolicy>
     GPIO<DirectionPolicy, InterfacePolicy>::~GPIO()
     {
-        std::cout << "delete..." << std::endl;
+        
     }
 
     // template<template<class> class DirectionPolicy, typename InterfacePolicy>
@@ -75,7 +76,7 @@ namespace io
 
 
 
-    SystemInterface::SystemInterface ( unsigned char pin ) : pin_(pin)
+    SystemInterface::SystemInterface ( unsigned char pin ) throw(io_exception) : pin_(pin) 
     {
         
         std::stringstream ss;
@@ -106,7 +107,7 @@ namespace io
 
 
     template<template<class> class Direction>
-    void SystemInterface::init (  ) const
+    void SystemInterface::init (  )  const throw(io_exception)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::string file(baseGPIOFile + std::string("/gpio") + strPin_ + "/direction");
@@ -120,7 +121,7 @@ namespace io
         
     }
 
-    PinState SystemInterface::read (  ) const
+    PinState SystemInterface::read (  ) const throw(io_exception)
     {
         std::ifstream fis( "/sys/class/gpio/gpio" + strPin_ + "/value" );
         if( !fis )
@@ -134,7 +135,7 @@ namespace io
     }
 
 
-    void SystemInterface::set ( PinState value ) const
+    void SystemInterface::set ( PinState value ) const throw(io_exception)
     {
         std::ofstream fos( "/sys/class/gpio/gpio" + strPin_ + "/value" );
         if( !fos )
@@ -154,7 +155,7 @@ namespace io
             std::ofstream fos( unexportFile );
             if( !fos )
             {
-                throw io_exception( "Pin " + strPin_ + "(at unexport)" );
+                std::cerr <<  "ERROR : Pin " + strPin_ + "(at unexport)";
             }
             fos << strPin_;
             fos.close();
