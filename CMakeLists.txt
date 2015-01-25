@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
+set( RASP_USER pi )
+set( RASP_HOST bluelemon)
+SET( RASPTOOLS_PATH /home/tim288/prog/lib/rasp )
 SET(CMAKE_TOOLCHAIN_FILE "cmake/pi.cmake" )
 project(bluelemon)
 
@@ -19,8 +22,7 @@ add_subdirectory(includes)
 add_subdirectory(tpl)
 
 
-set( RASP_USER pi )
-set( RASP_HOST bluelemon)
+
 
 add_upload()
 add_run()
