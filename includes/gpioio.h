@@ -33,7 +33,7 @@ namespace io
         
         Input(unsigned char pin);
     public:
-        PinState read();
+        PinState read() const;
     };
     
     template<typename InterfacePolicy>
@@ -44,7 +44,7 @@ namespace io
         
         Output(unsigned char pin);
     public:
-        void set( PinState value);
+        void set( PinState value) const;
     };
     
     

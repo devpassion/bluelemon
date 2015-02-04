@@ -46,6 +46,15 @@ namespace io
     {
         
     }
+    
+    template<template<class> class DirectionPolicy, typename InterfacePolicy>
+    GPIO<DirectionPolicy, InterfacePolicy>::GPIO ( const GPIO<DirectionPolicy, InterfacePolicy>& other ) : GPIO(other.getPin())
+    {
+
+    }
+
+ 
+
 
 
 //     template<template<class> class DirectionPolicy, typename InterfacePolicy>
@@ -76,92 +85,7 @@ namespace io
 
 
 
-    SystemInterface::SystemInterface ( unsigned char pin ) throw(io_exception) : pin_(pin) 
-    {
-        
-        std::stringstream ss;
-        ss << static_cast<short>(pin);
-        strPin_ = ss.str();
-        
-        mutexes_[pin].lock();
-        
-        if( UserCounts[pin] == 0 )
-        {
-            std::ofstream fos( exportFile );
-            auto start = std::chrono::steady_clock::now();  
-            while( !fos )
-            {
-                auto elapsed = std::chrono::steady_clock::now() - start;
-                if( elapsed.count() >  fileTimeout)
-                {
-                    throw io_exception( "Pin " + strPin_ + " (at export)" );
-                }
-            }
-            fos << strPin_;
-            fos.close();
-        }
-        
-        UserCounts[pin]++;
-        mutexes_[pin].unlock();
-    }
-
-
-    template<template<class> class Direction>
-    void SystemInterface::init (  )  const throw(io_exception)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::string file(baseGPIOFile + std::string("/gpio") + strPin_ + "/direction");
-        std::ofstream fos( file );
-        if( !fos )
-        {
-            throw io_exception( "Pin " + strPin_ + "(at direction set), file :" + file );
-        }
-        fos << StrDirectionTrait<Direction>::value;
-        fos.close();
-        
-    }
-
-    PinState SystemInterface::read (  ) const throw(io_exception)
-    {
-        std::ifstream fis( "/sys/class/gpio/gpio" + strPin_ + "/value" );
-        if( !fis )
-        {
-            throw io_exception( "Pin " + strPin_ + "(at read input value)" );
-        }
-        char val;
-        fis >> val;
-        fis.close();
-        return static_cast<PinState>( val );
-    }
-
-
-    void SystemInterface::set ( PinState value ) const throw(io_exception)
-    {
-        std::ofstream fos( "/sys/class/gpio/gpio" + strPin_ + "/value" );
-        if( !fos )
-        {
-            throw io_exception( "Pin " + strPin_ + "(at write output value)" );
-        }
-        fos << static_cast<char>( value );
-        fos.close();
-    }
-
-    SystemInterface::~SystemInterface()
-    {
-        mutexes_[pin_].lock();
-        UserCounts[pin_]--;
-        if( UserCounts[pin_] == 0 )
-        {
-            std::ofstream fos( unexportFile );
-            if( !fos )
-            {
-                std::cerr <<  "ERROR : Pin " + strPin_ + "(at unexport)";
-            }
-            fos << strPin_;
-            fos.close();
-        }
-        mutexes_[pin_].unlock();
-    }
+    
 
 }
 

@@ -23,7 +23,7 @@
 namespace io 
 {
     template<typename PinType>
-    inline typename std::add_rvalue_reference<typename PinContainer<PinType>::CPintype>::type PinContainer<PinType>::getPin() const
+    inline typename PinContainer<PinType>::CPintype PinContainer<PinType>::getPin() const
     {
         return pin_;
     }

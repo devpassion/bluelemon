@@ -12,14 +12,15 @@ add_definitions( "-Os -s" )
 
 # add_definitions( "-findirect-inlining -finline-functions -finline-functions-called-once -finline-small-functions" )
 
-
-add_executable(bluelemon main.cpp src/io_exception.cpp)
-
-install(TARGETS bluelemon RUNTIME DESTINATION bin)
-
 add_subdirectory(src)
 add_subdirectory(includes)
 add_subdirectory(tpl)
+
+add_executable(bluelemon main.cpp src/io_exception.cpp  )
+
+install(TARGETS bluelemon RUNTIME DESTINATION bin)
+
+
 
 
 

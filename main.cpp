@@ -1,15 +1,49 @@
 #include <iostream>
-#include <gpio.h>
 #include <chrono>
 #include <thread>
 
+#include "transmitter.h"
+
+
 using namespace io;
+
+void blink();
+
+void tx();
 
 int main(int argc, char **argv) {
     
     std::cout << "Begin..." << std::endl;
     
+    tx();
     
+    std::cout << "Bye ..." << std::endl;
+    
+    return 0;
+}
+
+
+void tx()
+{
+    try {
+        GPIO<Output> gpio(4);
+        
+        std::cout << "TX on GPIO 4 ..." << std::endl;
+        
+        Transmitter tx_( gpio, 0x55, 1 );
+        
+        tx_ << 'A';
+        
+    }
+    catch( std::exception& ex )
+    {
+        std::cerr << "ERROR: " << ex.what() << std::endl;
+    }
+}
+
+
+void blink()
+{
     try {
         GPIO<Output> gpio(4);
         
@@ -37,7 +71,4 @@ int main(int argc, char **argv) {
     {
         std::cerr << "ERROR: " << ex.what() << std::endl;
     }
-    std::cout << "Bye ..." << std::endl;
-    
-    return 0;
 }
