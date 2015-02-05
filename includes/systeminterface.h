@@ -20,6 +20,23 @@
 #ifndef IO_SYSTEMINTERFACE_H
 #define IO_SYSTEMINTERFACE_H
 
+
+
+namespace std 
+{
+    template<template<class> class A, template<class> class B>
+    struct is_same_tpl : false_type
+    {
+    };
+    
+    template<template<class> class A>
+    struct is_same_tpl<A,A> : true_type
+    {
+    };
+    
+    
+};
+
 namespace io {
 
 template<int Val>
@@ -28,7 +45,11 @@ template<int Val>
         static constexpr unsigned short value = 0;
     };
     
+    template<typename InterfacePolicy>
+    class Input;
     
+    template<typename InterfacePolicy>
+    class Output;
     
     class SystemInterface
     {
@@ -57,9 +78,11 @@ template<int Val>
         template<template<class> class Direction>
         void init() const throw(io_exception);
         
-        void set(PinState value) const throw(io_exception);
+        template<template<class> class Direction>
+        typename std::enable_if< std::is_same_tpl<Direction,Output>::value>::type set(PinState value) const throw(io_exception);
         
-        PinState read() const throw(io_exception); 
+        template<template<class> class Direction>
+        typename std::enable_if< std::is_same_tpl<Direction,Input>::value,PinState>::type read() const throw(io_exception); 
         
         ~SystemInterface();
       

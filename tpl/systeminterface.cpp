@@ -83,7 +83,8 @@ using namespace io;
     }
 
     
-    PinState SystemInterface::read (  ) const throw(io_exception)
+    template<template<class> class Direction>
+    typename std::enable_if< std::is_same_tpl<Direction,Input>::value,PinState>::type SystemInterface::read (  ) const throw(io_exception)
     {
         std::ifstream fis( "/sys/class/gpio/gpio" + strPin_ + "/value" );
         if( !fis )
@@ -97,7 +98,8 @@ using namespace io;
     }
 
 
-    void SystemInterface::set ( PinState value ) const throw(io_exception)
+    template<template<class> class Direction>
+    typename std::enable_if< std::is_same_tpl<Direction,Output>::value>::type SystemInterface::set ( PinState value ) const throw(io_exception)
     {
         std::ofstream fos( "/sys/class/gpio/gpio" + strPin_ + "/value" );
         if( !fos )

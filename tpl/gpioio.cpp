@@ -38,12 +38,12 @@ namespace io
     template<typename InterfacePolicy>
     PinState Input<InterfacePolicy>::read() const
     {
-        return interface.read();
+        return interface.template read<Input>();
     }
 
     template<typename InterfacePolicy>
     void Output<InterfacePolicy>::set ( PinState value ) const
     {
-        interface.set( value);
+        interface.template set<Output>( value);
     }
 }
