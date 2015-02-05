@@ -30,7 +30,7 @@ void tx()
         
         std::cout << "TX on GPIO 4 ..." << std::endl;
         
-        Transmitter tx_( gpio, 0x55, 1 );
+        Transmitter<> tx_( gpio, 0x55, 1 );
         
         tx_ << 'A';
         

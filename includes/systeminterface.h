@@ -58,10 +58,13 @@ template<int Val>
         static constexpr const char* exportFile = "/sys/class/gpio/export";
         static constexpr const char* unexportFile = "/sys/class/gpio/unexport";
         
+        static constexpr const int PortsCount = 18;
+        
+        
         static constexpr int fileTimeout = 500;
         
-        static std::array<unsigned short, 18> UserCounts;
-        static std::array<std::mutex, 18> mutexes_;
+        static std::array<unsigned short, PortsCount> UserCounts;
+        static std::array<std::mutex, PortsCount> mutexes_;
         
         const unsigned char pin_;
         std::string strPin_;

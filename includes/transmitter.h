@@ -24,11 +24,13 @@
 
 #include "pin.h"
 #include "gpio.h"
+#include "frequency.h"
+#include "clock.h"
 
 namespace io {
 
-
-    class Transmitter
+    template<typename FreqPolicy = timer::RuntimeFreq<unsigned long> >
+    class Transmitter // : FreqPolicy
     {
         const unsigned long frequency_;
         const unsigned char startSeq_;
@@ -41,10 +43,11 @@ namespace io {
     public:
         
         template<typename InterfaceType>
-        Transmitter(GPIO<Output, InterfaceType>& gpio, unsigned char startSeq, unsigned long frequency );
+        Transmitter(GPIO<Output, InterfaceType>& gpio, unsigned char startSeq, typename FreqPolicy::TickType frequency );
 
         template<typename InterfaceType>
-        Transmitter(GPIO<Output, InterfaceType>&& gpio, unsigned char startSeq, unsigned long frequency );
+        Transmitter(GPIO<Output, InterfaceType>&& gpio, unsigned char startSeq, typename FreqPolicy::TickType frequency );
+        
         
         Transmitter(const Transmitter& other) = default;
         
@@ -53,6 +56,9 @@ namespace io {
         
         ~Transmitter();
         
+        template<unsigned int IntervalDivision>
+        void PWM( unsigned char level );
+        
         Transmitter& operator=(const Transmitter& other) = delete;
         
         bool operator==(const Transmitter& other) const = delete;
@@ -60,17 +66,18 @@ namespace io {
         
     };
     
-    
+    template<typename FreqPolicy>
     template<typename InterfaceType>
-    Transmitter::Transmitter( GPIO<Output, InterfaceType>& gpio, unsigned char startSeq, unsigned long frequency ) 
+    Transmitter<FreqPolicy>::Transmitter( GPIO<Output, InterfaceType>& gpio, unsigned char startSeq, typename FreqPolicy::TickType frequency ) 
         : gpio_(gpio), startSeq_(startSeq), frequency_(frequency), 
         period_( static_cast<float>(1000000000) / ( static_cast<float>(frequency_ ) ))
     {
         std::cout << "period : " << period_ << std::endl;
     }
     
+    template<typename FreqPolicy>
     template<typename InterfaceType>
-    Transmitter::Transmitter( GPIO<Output, InterfaceType>&& gpio, unsigned char startSeq, unsigned long frequency ) 
+    Transmitter<FreqPolicy>::Transmitter( GPIO<Output, InterfaceType>&& gpio, unsigned char startSeq, typename FreqPolicy::TickType frequency ) 
         : gpio_(gpio), startSeq_(startSeq), frequency_(frequency), 
         period_( static_cast<float>(1000000000) / ( static_cast<float>(frequency_ ) ))
     {
@@ -78,15 +85,17 @@ namespace io {
     }
     
     
+    template<typename FreqPolicy>
     template<typename T>
-    Transmitter& Transmitter::operator<< ( T value )
+    Transmitter<FreqPolicy>& Transmitter<FreqPolicy>::operator<< ( T value )
     {
         send( startSeq_ );
         send( value );
     }
 
+    template<typename FreqPolicy>
     template<typename T>
-    Transmitter& Transmitter::send ( T value )
+    Transmitter<FreqPolicy>& Transmitter<FreqPolicy>::send ( T value )
     {
         size_t s = sizeof( T ) * 8;
         std::cout << "send " << value << " od size (" << s << ")..." << std::endl;
@@ -101,7 +110,15 @@ namespace io {
         };
     }
     
-    Transmitter::~Transmitter()
+    template<typename FreqPolicy>
+    template<unsigned int IntervalDivision>
+    void Transmitter<FreqPolicy>::PWM(unsigned char level)
+    {
+        //static Clock<>
+    }
+
+    template<typename FreqPolicy>
+    Transmitter<FreqPolicy>::~Transmitter()
     {
 
     }
