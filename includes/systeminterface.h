@@ -21,7 +21,6 @@
 #define IO_SYSTEMINTERFACE_H
 
 
-
 namespace std 
 {
     template<template<class> class A, template<class> class B>
@@ -67,6 +66,13 @@ template<int Val>
         const unsigned char pin_;
         std::string strPin_;
         
+        template<typename InType>
+        static void sendToFile( std::string file, InType str, std::string errorMsg ) throw(io_exception);
+        
+        
+        template<typename OutType>
+        static OutType readFromFile( std::string file, std::string errorMsg ) throw(io_exception);
+        
     public:
         
         SystemInterface(unsigned char pin) throw(io_exception);
@@ -87,6 +93,9 @@ template<int Val>
         ~SystemInterface();
       
     };
+    
+    
+    
 }
 
 #include "../tpl/systeminterface.cpp"
